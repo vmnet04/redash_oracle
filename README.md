@@ -1,3 +1,5 @@
+WORK IN PROGRESS -- DO NOT USE
+
 **Redash Installation Guide with Oracle Support on Centos**
 
 
