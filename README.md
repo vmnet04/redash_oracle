@@ -4,6 +4,7 @@
 **1. Clone the current repository**
 
 $ git clone https://github.com/vmnet02/redash_oracle
+
 Navigate to the redash_oracle directory
 
 
