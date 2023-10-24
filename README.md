@@ -19,11 +19,14 @@ $ ./setup.sh
 
 #/redash_oracle/
 $ docker build --pull -t redash/redash: .
+
 For updates, you can force an image refresh
 
 #/redash_oracle/
 $ docker build --pull -t redash/redash:latest -t redash/redash:<actual redash version> .
-To support Cyrillic characters in queries, you may need to change or add the shell encoding. Check your current encoding with the command:
+
+To support Cyrillic characters in queries, you may need to change or add the shell encoding. 
+Check your current encoding with the command:
 
 #/redash_oracle/
 $ echo $LANG
@@ -33,6 +36,7 @@ To change the encoding:
 #/redash_oracle/
 $ export LANG=en_US.UTF-8
 If you had Redash installed previously, make backups of the /opt/redash and var/lib/postgresql directories. Stop all containers with:
+
 
 
 #/redash_oracle/
@@ -46,6 +50,7 @@ $ docker-compose stop server scheduler scheduled_worker adhoc_worker
 
 Copy the docker-compose.yml file from /redash_oracle to /opt/redash before deployment, 
 or update the file at https://github.com/getredash/setup.
+
 For a new Redash installation, execute the following commands:
 
 $ cd /opt/redash
