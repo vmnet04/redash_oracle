@@ -1,61 +1,68 @@
-# Инструкция по установке Redash c поддержкой Oracle
-### 1. Клонировать текущий репозитрий
-```bash
-$ git clone https://github.com/wai81/redash_oracle
-```
-Зайдите в redash_oracle
-```bash
+**Redash Installation Guide with Oracle Support on Centos**
+**1. Clone the current repository**
+bash
+Copy code
+$ git clone https://github.com/vmnet02/redash_oracle
+Navigate to the redash_oracle directory
+
+bash
+Copy code
 $ cd /redash_oracle
-```
-### 2 Запустить настройку если увас нет установленого Redash
-```bash
+**2. Run setup if you don't have Redash installed**
+bash
+Copy code
 #/redash_oracle/
 $ chmod a+x setup.sh
 $ ./setup.sh
-```
-### 3. Создайте пользовательское изображение докера для новой установки
-```bash
+**3. Create a custom Docker image for a new installation**
+bash
+Copy code
 #/redash_oracle/
 $ docker build --pull -t redash/redash: .
-```
-для обновления необходимо принудительне обновнеие изображения
-```bash
+For updates, you can force an image refresh
+
+bash
+Copy code
 #/redash_oracle/
 $ docker build --pull -t redash/redash:latest -t redash/redash:<actual redash version> .
-```
-Для поддежки кирилици в запрсах необходимо изменить/добавить кодировку оболочки
-проветь какя кодировка командой
-```bash
+To support Cyrillic characters in queries, you may need to change or add the shell encoding. Check your current encoding with the command:
+
+bash
+Copy code
 #/redash_oracle/
 $ echo $LANG
-```
-Изменить кодировку
-```bash
+To change the encoding:
+
+bash
+Copy code
 #/redash_oracle/
-$ export LANG=ru_RU.utf8
-```
-Если у вас был ранее установлен Redash. Сделайте резевную копию директорий /opt/redash и var/lib/postgresql.
-Остановите все контейнеры
-```bash
+$ export LANG=en_US.UTF-8
+If you had Redash installed previously, make backups of the /opt/redash and var/lib/postgresql directories. Stop all containers with:
+
+bash
+Copy code
 #/redash_oracle/
 $ docker stop $(docker ps -a -q)
-```
-или только контейнеры Redash
-```bash
-$ docker-compose stop server scheduler scheduled_worker adhoc_worker
-```
-### 4 Развернуть контейнер
-Скопируйте из /redash_oracle/docker-compose.yml в /opt/redash перед развертыванием или обновите файл https://github.com/getredash/setup
+Or only Redash containers with:
 
-Для новой установки Redash выполните команды:
-```bash
+bash
+Copy code
+$ docker-compose stop server scheduler scheduled_worker adhoc_worker
+**4. Deploy the container**
+Copy the docker-compose.yml file from /redash_oracle to /opt/redash before deployment, or update the file at https://github.com/getredash/setup.
+
+For a new Redash installation, execute the following commands:
+
+bash
+Copy code
 $ cd /opt/redash
 $ docker-compose run --rm server create_db
 $ docker-compose up -d
-```
-Для обновления Redash выполните команды:
-```bash
+For Redash updates, execute the following commands:
+
+bash
+Copy code
 $ cd /opt/redash
 $ docker-compose run --rm server manage db upgrade
 $ docker-compose up -d
-```
+This guide will help you set up Redash with Oracle support on your system.
