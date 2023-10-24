@@ -12,6 +12,7 @@ $ cd /redash_oracle
 **2. Run setup if you don't have Redash installed**
 
 #/redash_oracle/
+
 $ chmod a+x setup.sh
 
 $ ./setup.sh
