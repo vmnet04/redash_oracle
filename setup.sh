@@ -1,31 +1,38 @@
-#!/bin/bash
-# This script sets up Dockerized Redash on CentOS 7.
+#!/usr/bin/env bash
+# This script setups dockerized Redash on CentOS 7.6
 set -eu
 
 REDASH_BASE_PATH=/opt/redash
 
-install_docker() {
+install_docker(){
     # Install Docker
-    sudo yum -y install yum-utils
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    sudo yum -y install docker-ce
-
-    # Start and enable Docker service
-    sudo systemctl start docker
-    sudo systemctl enable docker
+    yum install epel-release
+    yum install yum-utils device-mapper-persistent-data lvm2
+    yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+	
+    yum install docker-ce docker-ce-cli containerd.io
+    
+    systemctl start docker
+    systemctl enable docker
 
     # Install Docker Compose
-    sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+    yum-builddep python
+    yum install python-pip python-devel wget pwgen perl-JSON-PP
+
+    wget https://github.com/docker/compose/releases/download/1.22.0/docker-compose-Linux-x86_64
+    mv docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
 
     # Allow current user to run Docker commands
-    sudo usermod -aG docker $USER
+    usermod -aG docker $USER
 }
 
 create_directories() {
     if [[ ! -e $REDASH_BASE_PATH ]]; then
-        sudo mkdir -p $REDASH_BASE_PATH
-        sudo chown $USER:$USER $REDASH_BASE_PATH
+        mkdir -p $REDASH_BASE_PATH
+        chown $USER:$USER $REDASH_BASE_PATH
     fi
 
     if [[ ! -e $REDASH_BASE_PATH/postgres-data ]]; then
@@ -35,25 +42,40 @@ create_directories() {
 
 create_config() {
     if [[ -e $REDASH_BASE_PATH/env ]]; then
-        now=$(date +%s)
-        mv $REDASH_BASE_PATH/env $REDASH_BASE_PATH/env.$now.bk
+        rm $REDASH_BASE_PATH/env
         touch $REDASH_BASE_PATH/env
     fi
 
     COOKIE_SECRET=$(pwgen -1s 32)
+    SECRET_KEY=$(pwgen -1s 32)
     POSTGRES_PASSWORD=$(pwgen -1s 32)
     REDASH_DATABASE_URL="postgresql://postgres:${POSTGRES_PASSWORD}@postgres/postgres"
-    NLS_LANG=American_America.UTF8
 
     echo "PYTHONUNBUFFERED=0" >> $REDASH_BASE_PATH/env
     echo "REDASH_LOG_LEVEL=INFO" >> $REDASH_BASE_PATH/env
     echo "REDASH_REDIS_URL=redis://redis:6379/0" >> $REDASH_BASE_PATH/env
     echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> $REDASH_BASE_PATH/env
     echo "REDASH_COOKIE_SECRET=$COOKIE_SECRET" >> $REDASH_BASE_PATH/env
+    echo "REDASH_SECRET_KEY=$SECRET_KEY" >> $REDASH_BASE_PATH/env
     echo "REDASH_DATABASE_URL=$REDASH_DATABASE_URL" >> $REDASH_BASE_PATH/env
-    echo "NLS_LANG=$NLS_LANG" >> $REDASH_BASE_PATH/env
+}
+
+setup_compose() {
+    cp data/docker-compose.yml /opt/redash/docker-compose.yml
+    REQUESTED_CHANNEL=stable
+    LATEST_VERSION=`curl -s "https://version.redash.io/api/releases?channel=$REQUESTED_CHANNEL"  | json_pp  | grep "docker_image" | head -n 1 | awk 'BEGIN{FS=":"}{print $3}' | awk 'BEGIN{FS="\""}{print $1}'`
+
+    cd $REDASH_BASE_PATH
+    GIT_BRANCH="${REDASH_BRANCH:-master}" # Default branch/version to master if not specified in REDASH_BRANCH env var
+    echo "export COMPOSE_PROJECT_NAME=redash" >> ~/.profile
+    echo "export COMPOSE_FILE=/opt/redash/docker-compose.yml" >> ~/.profile
+    export COMPOSE_PROJECT_NAME=redash
+    export COMPOSE_FILE=/opt/redash/docker-compose.yml
+    docker-compose run --rm server create_db
+    docker-compose up -d
 }
 
 install_docker
 create_directories
 create_config
+setup_compose
