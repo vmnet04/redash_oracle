@@ -13,6 +13,7 @@ $ cd /redash_oracle
 
 #/redash_oracle/
 $ chmod a+x setup.sh
+
 $ ./setup.sh
 
 **3. Create a custom Docker image for a new installation**
