@@ -1,5 +1,8 @@
 **Redash Installation Guide with Oracle Support on Centos**
+
+
 **1. Clone the current repository**
+
 bash
 Copy code
 $ git clone https://github.com/vmnet02/redash_oracle
@@ -8,13 +11,17 @@ Navigate to the redash_oracle directory
 bash
 Copy code
 $ cd /redash_oracle
+
 **2. Run setup if you don't have Redash installed**
+
 bash
 Copy code
 #/redash_oracle/
 $ chmod a+x setup.sh
 $ ./setup.sh
+
 **3. Create a custom Docker image for a new installation**
+
 bash
 Copy code
 #/redash_oracle/
@@ -48,9 +55,11 @@ Or only Redash containers with:
 bash
 Copy code
 $ docker-compose stop server scheduler scheduled_worker adhoc_worker
-**4. Deploy the container**
-Copy the docker-compose.yml file from /redash_oracle to /opt/redash before deployment, or update the file at https://github.com/getredash/setup.
 
+**4. Deploy the container**
+
+Copy the docker-compose.yml file from /redash_oracle to /opt/redash before deployment, 
+or update the file at https://github.com/getredash/setup.
 For a new Redash installation, execute the following commands:
 
 bash
