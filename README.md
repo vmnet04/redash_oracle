@@ -7,7 +7,7 @@ $ git clone https://github.com/vmnet02/redash_oracle
 Navigate to the redash_oracle directory
 
 
-$ cd /redash_oracle
+$ cd redash_oracle
 
 **2. Run setup if you don't have Redash installed**
 
